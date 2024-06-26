@@ -1,0 +1,32 @@
+server:
+  port: ${server_port}
+
+spring:
+  application:
+    name: Slick-Scheduler
+  threads:
+    virtual:
+      enabled: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            logger-level: headers
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: ${jasypt_encryptor_password}
+
+logging:
+  level:
+    toy.slick.feign: debug
+
+telegram:
+  bot:
+    slick:
+      apiToken: ENC(2FgpskdhK7pq5Wuax0WxeNiWV5t3jIUdkGAEnVSZ51DXFBGg4d9YhauQAYByel1yslTWbNa4iUv3s6yiLxYWNw==)
+  chat:
+    slick:
+      id: ENC(UE0sacH3feg87lC3UdSB3VwwnHhgmyir)

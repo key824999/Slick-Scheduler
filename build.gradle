@@ -1,0 +1,41 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.5'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'toy'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	/* implementation */
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+	implementation 'org.apache.commons:commons-lang3:3.14.0'
+	implementation 'com.google.code.gson:gson:2.11.0'
+	implementation 'org.jsoup:jsoup:1.17.2'
+
+	/* testImplementation */
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	/* compileOnly */
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+
+	/* annotationProcessor */
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
