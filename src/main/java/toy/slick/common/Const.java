@@ -12,5 +12,6 @@ public interface Const {
     interface ZoneId {
         String NEW_YORK = "America/New_York";
         String SEOUL = "Asia/Seoul";
+        String UTC = "Etc/UTC";
     }
 }

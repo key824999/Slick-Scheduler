@@ -20,9 +20,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
+	implementation 'org.apache.commons:commons-collections4:4.5.0-M2'
 	implementation 'com.google.code.gson:gson:2.11.0'
 	implementation 'org.jsoup:jsoup:1.17.2'
 
