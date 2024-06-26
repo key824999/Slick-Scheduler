@@ -18,8 +18,6 @@ spring:
       uri: mongodb+srv://${mongodb_username}:${mongodb_password}@slick-mongodb.4irbr6v.mongodb.net/?retryWrites=true&w=majority&appName=slick-mongodb
       database: slick-mongodb
 
-
-
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
@@ -28,6 +26,24 @@ jasypt:
 logging:
   level:
     toy.slick.feign: debug
+
+management:
+  endpoints:
+    enabled-by-default: false
+    jmx:
+      exposure:
+        exclude: '*'
+    web:
+      exposure:
+        include: info, health
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+  info:
+    contact:
+      email: wjdwo951219@gmail.com
 
 telegram:
   bot:
