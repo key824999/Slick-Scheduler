@@ -13,8 +13,7 @@ import toy.slick.parser.EconomicInfoParser;
 import toy.slick.repository.mongo.EconomicEventRepository;
 import toy.slick.repository.mongo.FearAndGreedRepository;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public class EconomicInfoScheduler {
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "40 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
-    public void saveEconomicCalendar() {
+    public void saveEconomicEventList() {
         try {
             List<EconomicEventRepository.EconomicEvent> economicEventList = economicInfoParser.parseEconomicCalendar();
 
@@ -62,11 +61,12 @@ public class EconomicInfoScheduler {
             Optional<FearAndGreedRepository.FearAndGreed> fearAndGreed = economicInfoParser.parseFearAndGreed();
 
             if (fearAndGreed.isPresent()) {
-                String id = new SimpleDateFormat("yyyyMMddHH").format(new Date());
+                String id = LocalDateTime.now().format(Const.DateTimeFormat.yyyyMMddHH.dateTimeFormatter);
 
                 fearAndGreedRepository.save(fearAndGreed.get().toMongoData(id));
             } else {
-                throw new NullPointerException("Parsing result is Null");
+                // TODO : Exception message -> property
+                throw new NullPointerException("Parsing result is null");
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

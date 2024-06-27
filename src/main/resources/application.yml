@@ -26,6 +26,7 @@ jasypt:
 logging:
   level:
     toy.slick.feign: debug
+    org.springframework.data.mongodb.core.MongoTemplate: debug
 
 management:
   endpoints:
@@ -42,8 +43,12 @@ management:
     health:
       enabled: true
   info:
-    contact:
-      email: wjdwo951219@gmail.com
+    env:
+      enabled: true
+
+info:
+  contact:
+    email: wjdwo951219@gmail.com
 
 telegram:
   bot:

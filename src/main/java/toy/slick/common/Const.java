@@ -1,5 +1,7 @@
 package toy.slick.common;
 
+import java.time.format.DateTimeFormatter;
+
 public interface Const {
     String FACE_SCREAMING_IN_FEAR = "\uD83D\uDE31"; // 😱
     String FEARFUL_FACE = "\uD83D\uDE28"; // 😨
@@ -9,9 +11,24 @@ public interface Const {
     String FLAG = "\ud83d\udea9"; // 🚩
     String CHECK_MARK = "\u2705"; // ✅
 
+    enum DateTimeFormat {
+        yyyyMMdd("yyyyMMdd", DateTimeFormatter.ofPattern("yyyyMMdd")),
+        yyyyMMddHH("yyyyMMddHH", DateTimeFormatter.ofPattern("yyyyMMddHH")),
+        yyyyMMdd_DotBlank("yyyy. MM. dd.", DateTimeFormatter.ofPattern("yyyy. MM. dd.")),
+        yyyyMMddHHmmss("yyyy-MM-dd HH:mm:ss", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        public final String format;
+        public final DateTimeFormatter dateTimeFormatter;
+
+        DateTimeFormat(String format, DateTimeFormatter dateTimeFormatter) {
+            this.format = format;
+            this.dateTimeFormatter = dateTimeFormatter;
+        }
+    }
+
     interface ZoneId {
         String NEW_YORK = "America/New_York";
         String SEOUL = "Asia/Seoul";
-        String UTC = "Etc/UTC";
+        String UTC = "UTC";
     }
 }

@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
 import toy.slick.feign.CnnFeign;
+import toy.slick.feign.interfaces.FeignResponseReader;
 import toy.slick.feign.InvestingFeign;
 import toy.slick.repository.mongo.EconomicEventRepository;
 import toy.slick.repository.mongo.FearAndGreedRepository;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class EconomicInfoParser implements FeignParser {
+public class EconomicInfoParser implements FeignResponseReader {
     private final CnnFeign cnnFeign;
     private final InvestingFeign investingFeign;
 
@@ -79,13 +80,12 @@ public class EconomicInfoParser implements FeignParser {
 
         Element table = Jsoup.parse(feignResponseBody).getElementById("ecEventsTable");
         Elements rows = table.select("tbody tr");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         return rows.stream()
                 .filter(row -> row.hasAttr("event_attr_id"))
                 .filter(row -> StringUtils.isNotBlank(row.getElementsByClass("act").first().text()))
                 .map(row -> {
-                    ZonedDateTime time = ZonedDateTime.of(LocalDateTime.parse(row.attr("event_timestamp"), dateTimeFormatter), ZoneId.of(Const.ZoneId.UTC));
+                    ZonedDateTime time = ZonedDateTime.of(LocalDateTime.parse(row.attr("event_timestamp"), Const.DateTimeFormat.yyyyMMddHHmmss.dateTimeFormatter), ZoneId.of(Const.ZoneId.UTC));
                     String country = row.getElementsByClass("flagCur").first().getElementsByTag("span").first().attr("title");
                     String importance = row.getElementsByClass("sentiment").first().attr("title").split(" ")[0];
                     String id = row.attr("event_attr_id");
