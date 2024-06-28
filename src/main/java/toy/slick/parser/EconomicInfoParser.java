@@ -11,8 +11,8 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
 import toy.slick.feign.CnnFeign;
-import toy.slick.feign.interfaces.FeignResponseReader;
 import toy.slick.feign.InvestingFeign;
+import toy.slick.feign.interfaces.FeignResponseReader;
 import toy.slick.repository.mongo.EconomicEventRepository;
 import toy.slick.repository.mongo.FearAndGreedRepository;
 
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +81,7 @@ public class EconomicInfoParser implements FeignResponseReader {
         Elements rows = table.select("tbody tr");
 
         return rows.stream()
+                .parallel()
                 .filter(row -> row.hasAttr("event_attr_id"))
                 .filter(row -> StringUtils.isNotBlank(row.getElementsByClass("act").first().text()))
                 .map(row -> {

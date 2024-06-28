@@ -2,7 +2,6 @@ package toy.slick.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toy.slick.aspect.TimeLogAspect;
@@ -20,12 +19,9 @@ public class ExecuteScheduleController {
     }
 
     @TimeLogAspect.TimeLog
-    @GetMapping("/fearAndGreed/{zoneId}")
-    public String executeFearAndGreed(@PathVariable String zoneId) throws IOException {
-        switch (zoneId) {
-            case "NewYork" -> telegramScheduler.sendFearAndGreedNewYorkTimeZone();
-            case "Seoul" -> telegramScheduler.sendFearAndGreedSeoulTimeZone();
-        }
+    @GetMapping("/fearAndGreed")
+    public String executeFearAndGreed() throws IOException {
+        telegramScheduler.sendFearAndGreed();
 
         return HttpStatus.OK.getReasonPhrase();
     }
@@ -33,7 +29,7 @@ public class ExecuteScheduleController {
     @TimeLogAspect.TimeLog
     @GetMapping("/economicEventList")
     public String executeEconomicEventList() throws IOException {
-        telegramScheduler.sendEconomicEventList();
+        telegramScheduler.sendYesterdayEconomicEventList();
 
         return HttpStatus.OK.getReasonPhrase();
     }

@@ -16,6 +16,7 @@ import toy.slick.repository.mongo.FearAndGreedRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -42,9 +43,11 @@ public class EconomicInfoScheduler {
             List<EconomicEventRepository.EconomicEvent> economicEventList = economicInfoParser.parseEconomicCalendar();
 
             if (CollectionUtils.isNotEmpty(economicEventList)) {
-                economicEventList.stream()
+                economicEventRepository.saveAll(economicEventList
+                        .stream()
+                        .parallel()
                         .map(economicEvent -> economicEvent.toMongoData(economicEvent.getId()))
-                        .forEach(economicEventRepository::save);
+                        .collect(Collectors.toList()));
             } else {
                 throw new NullPointerException("Parsing result list is empty");
             }
@@ -65,8 +68,7 @@ public class EconomicInfoScheduler {
 
                 fearAndGreedRepository.save(fearAndGreed.get().toMongoData(id));
             } else {
-                // TODO : Exception message -> property
-                throw new NullPointerException("Parsing result is null");
+                throw new NullPointerException("Parsing result is null"); // TODO: Exception message -> property
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

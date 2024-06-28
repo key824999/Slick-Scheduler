@@ -13,6 +13,10 @@ spring:
         config:
           default:
             logger-level: headers
+  task:
+    scheduling:
+      pool:
+        size: 4
   data:
     mongodb:
       uri: mongodb+srv://${mongodb_username}:${mongodb_password}@slick-mongodb.4irbr6v.mongodb.net/?retryWrites=true&w=majority&appName=slick-mongodb
