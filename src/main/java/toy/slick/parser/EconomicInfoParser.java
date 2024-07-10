@@ -10,11 +10,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
-import toy.slick.feign.CnnFeign;
-import toy.slick.feign.InvestingFeign;
 import toy.slick.feign.interfaces.FeignResponseReader;
-import toy.slick.repository.mongo.EconomicEventRepository;
-import toy.slick.repository.mongo.FearAndGreedRepository;
+import toy.slick.parser.vo.EconomicEvent;
+import toy.slick.parser.vo.FearAndGreed;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -28,26 +26,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class EconomicInfoParser implements FeignResponseReader {
-    private final CnnFeign cnnFeign;
-    private final InvestingFeign investingFeign;
 
-    public EconomicInfoParser(CnnFeign cnnFeign,
-                              InvestingFeign investingFeign) {
-        this.cnnFeign = cnnFeign;
-        this.investingFeign = investingFeign;
-    }
+    public Optional<FearAndGreed> parseFearAndGreed(Response feignResponse) throws IOException {
+        String feignResponseBody = this.bodyToString(feignResponse);
 
-    public Optional<FearAndGreedRepository.FearAndGreed> parseFearAndGreed() throws IOException {
-        String feignResponseBody;
+        if (feignResponse.status() >= 400) {
+            log.error(feignResponseBody);
 
-        try (Response feignResponse = cnnFeign.getFearAndGreed()) {
-            feignResponseBody = this.bodyToString(feignResponse);
-
-            if (feignResponse.status() >= 400) {
-                log.error(feignResponseBody);
-
-                return Optional.empty();
-            }
+            return Optional.empty();
         }
 
         JsonObject jsonObject = JsonParser.parseString(feignResponseBody)
@@ -58,23 +44,19 @@ public class EconomicInfoParser implements FeignResponseReader {
         String rating = jsonObject.get("rating").getAsString();
         double score = Double.parseDouble(jsonObject.get("score").getAsString());
 
-        return Optional.of(FearAndGreedRepository.FearAndGreed.builder()
+        return Optional.of(FearAndGreed.builder()
                 .rating(rating)
                 .score(score)
                 .build());
     }
 
-    public List<EconomicEventRepository.EconomicEvent> parseEconomicCalendar() throws IOException {
-        String feignResponseBody;
+    public List<EconomicEvent> parseEconomicCalendar(Response feignResponse) throws IOException {
+        String feignResponseBody = this.bodyToString(feignResponse);
 
-        try (Response feignResponse = investingFeign.getEconomicCalendar()) {
-            feignResponseBody = this.bodyToString(feignResponse);
+        if (feignResponse.status() >= 400) {
+            log.error(feignResponseBody);
 
-            if (feignResponse.status() >= 400) {
-                log.error(feignResponseBody);
-
-                return Collections.emptyList();
-            }
+            return Collections.emptyList();
         }
 
         Element table = Jsoup.parse(feignResponseBody).getElementById("ecEventsTable");
@@ -94,7 +76,7 @@ public class EconomicInfoParser implements FeignResponseReader {
                     String forecast = row.getElementsByClass("fore").first().text();
                     String previous = row.getElementsByClass("prev").first().text();
 
-                    return EconomicEventRepository.EconomicEvent.builder()
+                    return EconomicEvent.builder()
                             .id(id)
                             .name(name)
                             .zonedDateTime(time.toString())

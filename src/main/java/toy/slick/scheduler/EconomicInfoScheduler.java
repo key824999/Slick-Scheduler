@@ -1,7 +1,9 @@
 package toy.slick.scheduler;
 
+import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -9,69 +11,67 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import toy.slick.aspect.TimeLogAspect;
 import toy.slick.common.Const;
+import toy.slick.feign.CnnFeign;
+import toy.slick.feign.InvestingFeign;
+import toy.slick.feign.SlickFeign;
 import toy.slick.parser.EconomicInfoParser;
-import toy.slick.repository.mongo.EconomicEventRepository;
-import toy.slick.repository.mongo.FearAndGreedRepository;
+import toy.slick.parser.vo.EconomicEvent;
+import toy.slick.parser.vo.FearAndGreed;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @EnableAsync
 @EnableScheduling
 public class EconomicInfoScheduler {
-    private final EconomicInfoParser economicInfoParser;
-    private final FearAndGreedRepository fearAndGreedRepository;
-    private final EconomicEventRepository economicEventRepository;
+    @Value("${slick.api.requestApiKey}")
+    private String slickRequestApiKey;
 
-    public EconomicInfoScheduler(EconomicInfoParser economicInfoParser,
-                                 FearAndGreedRepository fearAndGreedRepository,
-                                 EconomicEventRepository economicEventRepository) {
+    private final SlickFeign slickFeign;
+    private final CnnFeign cnnFeign;
+    private final InvestingFeign investingFeign;
+    private final EconomicInfoParser economicInfoParser;
+
+    public EconomicInfoScheduler(SlickFeign slickFeign,
+                                 CnnFeign cnnFeign,
+                                 InvestingFeign investingFeign,
+                                 EconomicInfoParser economicInfoParser) {
+        this.slickFeign = slickFeign;
+        this.cnnFeign = cnnFeign;
+        this.investingFeign = investingFeign;
         this.economicInfoParser = economicInfoParser;
-        this.fearAndGreedRepository = fearAndGreedRepository;
-        this.economicEventRepository = economicEventRepository;
     }
 
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "40 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
-    public void saveEconomicEventList() {
-        try {
-            List<EconomicEventRepository.EconomicEvent> economicEventList = economicInfoParser.parseEconomicCalendar();
+    public void saveEconomicEventList() throws IOException {
+        List<EconomicEvent> economicEventList = economicInfoParser.parseEconomicCalendar(investingFeign.getEconomicCalendar());
 
-            if (CollectionUtils.isNotEmpty(economicEventList)) {
-                economicEventRepository.saveAll(economicEventList
-                        .stream()
-                        .parallel()
-                        .map(economicEvent -> economicEvent.toMongoData(economicEvent.getId()))
-                        .collect(Collectors.toList()));
-            } else {
-                throw new NullPointerException("Parsing result list is empty");
+        if (CollectionUtils.isNotEmpty(economicEventList)) {
+            try (Response response = slickFeign.putEconomicEventList(slickRequestApiKey, economicEventList)) {
+                log.info(String.valueOf(response.status()), response);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } else {
+            throw new NullPointerException("Parsing result list is empty");
         }
     }
 
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "5 */20 * * * *", zone = Const.ZoneId.NEW_YORK)
-    public void saveFearAndGreed() {
-        try {
-            Optional<FearAndGreedRepository.FearAndGreed> fearAndGreed = economicInfoParser.parseFearAndGreed();
+    public void saveFearAndGreed() throws IOException {
+        Optional<FearAndGreed> fearAndGreed = economicInfoParser.parseFearAndGreed(cnnFeign.getFearAndGreed());
 
-            if (fearAndGreed.isPresent()) {
-                String id = LocalDateTime.now().format(Const.DateTimeFormat.yyyyMMddHH.dateTimeFormatter);
-
-                fearAndGreedRepository.save(fearAndGreed.get().toMongoData(id));
-            } else {
-                throw new NullPointerException("Parsing result is null"); // TODO: Exception message -> property
+        if (fearAndGreed.isPresent()) {
+            try (Response response = slickFeign.putFearAndGreed(slickRequestApiKey, fearAndGreed.get())) {
+                log.info(String.valueOf(response.status()), response);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } else {
+            throw new NullPointerException("Parsing result is null"); // TODO: Exception message -> property
         }
     }
 }

@@ -17,10 +17,6 @@ spring:
     scheduling:
       pool:
         size: 4
-  data:
-    mongodb:
-      uri: mongodb+srv://${mongodb_username}:${mongodb_password}@slick-mongodb.4irbr6v.mongodb.net/?retryWrites=true&w=majority&appName=slick-mongodb
-      database: slick-mongodb
 
 jasypt:
   encryptor:
@@ -30,7 +26,6 @@ jasypt:
 logging:
   level:
     toy.slick.feign: debug
-    org.springframework.data.mongodb.core.MongoTemplate: debug
 
 management:
   endpoints:
@@ -53,6 +48,10 @@ management:
 info:
   contact:
     email: wjdwo951219@gmail.com
+
+slick:
+  api:
+    requestApiKey: ${slick_api_requestApiKey}
 
 telegram:
   bot:

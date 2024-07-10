@@ -37,6 +37,8 @@ public class TelegramScheduler {
         this.telegramMessageParser = telegramMessageParser;
     }
 
+    // TODO: add Job
+
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "0 0 8 * * 1-5", zone = Const.ZoneId.SEOUL)

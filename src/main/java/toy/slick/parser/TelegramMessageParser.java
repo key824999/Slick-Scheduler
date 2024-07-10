@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
 import toy.slick.feign.SlickFeign;
@@ -20,6 +21,9 @@ import java.util.Map;
 @Slf4j
 @Component
 public class TelegramMessageParser implements SlickResponseReader {
+    @Value("${slick.api.requestApiKey}")
+    private String slickRequestApiKey;
+
     private final SlickFeign slickFeign;
 
     public TelegramMessageParser(SlickFeign slickFeign) {
@@ -27,7 +31,7 @@ public class TelegramMessageParser implements SlickResponseReader {
     }
 
     public String parseFearAndGreed() throws IOException {
-        JsonObject data = this.getDataObject(slickFeign.getFearAndGreed());
+        JsonObject data = this.getDataObject(slickFeign.getFearAndGreed(slickRequestApiKey));
 
         String rating = data.get("rating").getAsString();
         double score = Double.parseDouble(data.get("score").getAsString());
@@ -59,7 +63,8 @@ public class TelegramMessageParser implements SlickResponseReader {
     }
 
     public String parseEconomicEventList(ZonedDateTime zonedDateTime) throws IOException {
-        JsonArray data = this.getDataArray(slickFeign.getEconomicEventList(zonedDateTime.format(Const.DateTimeFormat.yyyyMMdd.dateTimeFormatter)));
+        JsonArray data = this.getDataArray(slickFeign.getEconomicEventList(slickRequestApiKey,
+                zonedDateTime.format(Const.DateTimeFormat.yyyyMMdd.dateTimeFormatter)));
 
         Map<String, List<String>> countryEconomicEventListMap = new HashMap<>();
 
