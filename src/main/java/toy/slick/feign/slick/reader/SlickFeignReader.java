@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
 import toy.slick.feign.interfaces.SlickResponseReader;
+import toy.slick.feign.slick.vo.response.EconomicEvent;
+import toy.slick.feign.slick.vo.response.FearAndGreed;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -23,10 +25,14 @@ import java.util.Optional;
 public class SlickFeignReader implements SlickResponseReader {
 
     public Optional<String> getFearAndGreedTelegramMessage(Response slickResponse) throws IOException {
-        JsonObject data = this.getDataObject(slickResponse);
+        Optional<FearAndGreed> fearAndGreed = this.getFearAndGreed(slickResponse);
 
-        String rating = data.get("rating").getAsString();
-        double score = Double.parseDouble(data.get("score").getAsString());
+        if (fearAndGreed.isEmpty()) {
+            throw new NullPointerException("fearAndGreed is empty");
+        }
+
+        String rating = fearAndGreed.get().getRating();
+        double score = fearAndGreed.get().getScore();
 
         StringBuilder messageBuilder = new StringBuilder();
 
@@ -57,20 +63,18 @@ public class SlickFeignReader implements SlickResponseReader {
     }
 
     public Optional<String> getEconomicEventListTelegramMessage(Response slickResponse, ZonedDateTime targetDateTime) throws IOException {
-        JsonArray data = this.getDataArray(slickResponse);
+        List<EconomicEvent> economicEventList = this.getEconomicEventList(slickResponse);
 
         Map<String, List<String>> countryEconomicEventListMap = new HashMap<>();
 
-        for (JsonElement row : data) {
-            JsonObject rowObject = row.getAsJsonObject();
-
-            String importance = rowObject.get("importance").getAsString();
-            String eventId = rowObject.get("id").getAsString();
-            String eventName = rowObject.get("name").getAsString();
-            String country = rowObject.get("country").getAsString();
-            String actualValue = rowObject.get("actual").getAsString();
-            String forecastValue = StringUtils.defaultIfBlank(rowObject.get("forecast").getAsString(), "-");
-            String previousValue = rowObject.get("previous").getAsString();
+        for (EconomicEvent economicEvent : economicEventList) {
+            String importance = economicEvent.getImportance();
+            String eventId = economicEvent.getId();
+            String eventName = economicEvent.getName();
+            String country = economicEvent.getCountry();
+            String actualValue = economicEvent.getActual();
+            String forecastValue = StringUtils.defaultIfBlank(economicEvent.getForecast(), "-");
+            String previousValue = economicEvent.getPrevious();
 
             if ("Low".equals(importance) || StringUtils.isBlank(actualValue)) {
                 continue;
@@ -124,5 +128,41 @@ public class SlickFeignReader implements SlickResponseReader {
         return messageBuilder.isEmpty()
                 ? Optional.empty()
                 : Optional.of(messageBuilder.toString());
+    }
+
+    public Optional<FearAndGreed> getFearAndGreed(Response slickResponse) throws IOException {
+        JsonObject data = this.getDataObject(slickResponse);
+
+        String rating = data.get("rating").getAsString();
+        double score = Double.parseDouble(data.get("score").getAsString());
+
+        return StringUtils.isBlank(rating)
+                ? Optional.empty()
+                : Optional.of(FearAndGreed.builder()
+                .rating(rating)
+                .score(score)
+                .build());
+    }
+
+    public List<EconomicEvent> getEconomicEventList(Response slickResponse) throws IOException {
+        List<EconomicEvent> economicEventList = new ArrayList<>();
+
+        JsonArray data = this.getDataArray(slickResponse);
+
+        for (JsonElement row : data) {
+            JsonObject rowObject = row.getAsJsonObject();
+
+            economicEventList.add(EconomicEvent.builder()
+                    .importance(rowObject.get("importance").getAsString())
+                    .id(rowObject.get("id").getAsString())
+                    .name(rowObject.get("name").getAsString())
+                    .country(rowObject.get("country").getAsString())
+                    .actual(rowObject.get("actual").getAsString())
+                    .forecast(rowObject.get("forecast").getAsString())
+                    .previous(rowObject.get("previous").getAsString())
+                    .build());
+        }
+
+        return economicEventList;
     }
 }
