@@ -1,7 +1,5 @@
-package toy.slick.converter;
+package toy.slick.feign.investing.reader;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,41 +8,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
-import toy.slick.feign.CnnFeign;
-import toy.slick.feign.InvestingFeign;
 import toy.slick.feign.interfaces.FeignResponseReader;
+import toy.slick.feign.investing.vo.response.EconomicEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class EconomicInfoConverter implements FeignResponseReader {
+public class InvestingFeignReader implements FeignResponseReader {
 
-    public Optional<CnnFeign.FearAndGreed> getCnnFearAndGreed(Response feignResponse) throws IOException {
-        String responseBody = this.getResponseBody(feignResponse);
-
-        JsonObject fearAndGreedJsonObj = JsonParser.parseString(responseBody)
-                .getAsJsonObject()
-                .get("fear_and_greed")
-                .getAsJsonObject();
-
-        String rating = fearAndGreedJsonObj.get("rating").getAsString();
-        double score = Double.parseDouble(fearAndGreedJsonObj.get("score").getAsString());
-
-        return Optional.of(CnnFeign.FearAndGreed.builder()
-                .rating(rating)
-                .score(score)
-                .build());
-    }
-
-    public List<InvestingFeign.EconomicEvent> getInvestingEconomicCalendar(Response feignResponse) throws IOException {
-        String responseBody = this.getResponseBody(feignResponse);
+    public List<EconomicEvent> getEconomicEventList(Response investingResponse) throws IOException {
+        String responseBody = this.getResponseBody(investingResponse);
 
         Element table = Jsoup.parse(responseBody).getElementById("ecEventsTable");
         Elements rows = table.select("tbody tr");
@@ -63,7 +42,7 @@ public class EconomicInfoConverter implements FeignResponseReader {
                     String forecast = row.getElementsByClass("fore").first().text();
                     String previous = row.getElementsByClass("prev").first().text();
 
-                    return InvestingFeign.EconomicEvent.builder()
+                    return EconomicEvent.builder()
                             .id(id)
                             .name(name)
                             .zonedDateTime(time.toString())

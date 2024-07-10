@@ -14,13 +14,13 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class SlickApplication {
 
-	@PostConstruct
-	public void init() {
-		TimeZone.setDefault(TimeZone.getTimeZone(Const.ZoneId.UTC));
-	}
+    @PostConstruct
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone(Const.ZoneId.UTC));
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(SlickApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SlickApplication.class, args);
+    }
 
 }

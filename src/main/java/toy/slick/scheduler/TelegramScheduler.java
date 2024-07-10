@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import toy.slick.aspect.TimeLogAspect;
 import toy.slick.common.Const;
-import toy.slick.converter.TelegramMessageConverter;
-import toy.slick.feign.SlickFeign;
-import toy.slick.feign.TelegramFeign;
+import toy.slick.feign.slick.reader.SlickFeignReader;
+import toy.slick.feign.slick.SlickFeign;
+import toy.slick.feign.telegram.TelegramFeign;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -30,22 +30,21 @@ public class TelegramScheduler {
 
     private final SlickFeign slickFeign;
     private final TelegramFeign telegramFeign;
-    private final TelegramMessageConverter telegramMessageConverter;
+
+    private final SlickFeignReader slickFeignReader;
 
     public TelegramScheduler(@Value("${slick.api.requestApiKey}") String SLICK_REQUEST_API_KEY,
                              @Value("${telegram.bot.slick.apiToken}") String SLICK_BOT_API_TOKEN,
                              @Value("${telegram.chat.slick.id}") String SLICK_CHAT_ID,
                              SlickFeign slickFeign, TelegramFeign telegramFeign,
-                             TelegramMessageConverter telegramMessageConverter) {
+                             SlickFeignReader slickFeignReader) {
         this.SLICK_REQUEST_API_KEY = SLICK_REQUEST_API_KEY;
         this.SLICK_BOT_API_TOKEN = SLICK_BOT_API_TOKEN;
         this.SLICK_CHAT_ID = SLICK_CHAT_ID;
         this.slickFeign = slickFeign;
         this.telegramFeign = telegramFeign;
-        this.telegramMessageConverter = telegramMessageConverter;
+        this.slickFeignReader = slickFeignReader;
     }
-
-    // TODO: add Job
 
     @TimeLogAspect.TimeLog
     @Async
@@ -54,12 +53,12 @@ public class TelegramScheduler {
     public void sendFearAndGreed() throws IOException {
         Optional<String> message;
 
-        try (Response feignResponse = slickFeign.getFearAndGreed(SLICK_REQUEST_API_KEY)) {
-            message = telegramMessageConverter.getFearAndGreed(feignResponse);
+        try (Response response = slickFeign.getFearAndGreed(SLICK_REQUEST_API_KEY)) {
+            message = slickFeignReader.getFearAndGreedTelegramMessage(response);
         }
 
         if (message.isEmpty()) {
-            throw new NullPointerException("telegram message is blank");
+            throw new NullPointerException("message is empty");
         }
 
         try (Response response = telegramFeign.sendHtmlWithoutPreview(SLICK_BOT_API_TOKEN, SLICK_CHAT_ID, message.get())) {
@@ -74,13 +73,13 @@ public class TelegramScheduler {
         Optional<String> message;
         ZonedDateTime yesterdayDateTime = ZonedDateTime.now(ZoneId.of(Const.ZoneId.UTC)).minusDays(1);
 
-        try (Response feignResponse = slickFeign.getEconomicEventList(SLICK_REQUEST_API_KEY,
+        try (Response response = slickFeign.getEconomicEventList(SLICK_REQUEST_API_KEY,
                 yesterdayDateTime.format(Const.DateTimeFormat.yyyyMMdd_hyphen.getDateTimeFormatter()))) {
-            message = telegramMessageConverter.getEconomicEventList(feignResponse, yesterdayDateTime);
+            message = slickFeignReader.getEconomicEventListTelegramMessage(response, yesterdayDateTime);
         }
 
         if (message.isEmpty()) {
-            throw new NullPointerException("telegram message is blank");
+            throw new NullPointerException("message is empty");
         }
 
         try (Response response = telegramFeign.sendHtmlWithoutPreview(SLICK_BOT_API_TOKEN, SLICK_CHAT_ID, message.get())) {

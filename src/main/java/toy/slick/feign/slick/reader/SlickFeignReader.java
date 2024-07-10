@@ -1,4 +1,4 @@
-package toy.slick.converter;
+package toy.slick.feign.slick.reader;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,10 +20,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class TelegramMessageConverter implements SlickResponseReader {
+public class SlickFeignReader implements SlickResponseReader {
 
-    public Optional<String> getFearAndGreed(Response feignResponse) throws IOException {
-        JsonObject data = this.getDataObject(feignResponse);
+    public Optional<String> getFearAndGreedTelegramMessage(Response slickResponse) throws IOException {
+        JsonObject data = this.getDataObject(slickResponse);
 
         String rating = data.get("rating").getAsString();
         double score = Double.parseDouble(data.get("score").getAsString());
@@ -56,8 +56,8 @@ public class TelegramMessageConverter implements SlickResponseReader {
                 : Optional.of(messageBuilder.toString());
     }
 
-    public Optional<String> getEconomicEventList(Response feignResponse, ZonedDateTime targetDateTime) throws IOException {
-        JsonArray data = this.getDataArray(feignResponse);
+    public Optional<String> getEconomicEventListTelegramMessage(Response slickResponse, ZonedDateTime targetDateTime) throws IOException {
+        JsonArray data = this.getDataArray(slickResponse);
 
         Map<String, List<String>> countryEconomicEventListMap = new HashMap<>();
 
@@ -121,6 +121,8 @@ public class TelegramMessageConverter implements SlickResponseReader {
                     .append("\n");
         }
 
-        return Optional.of(messageBuilder.toString());
+        return messageBuilder.isEmpty()
+                ? Optional.empty()
+                : Optional.of(messageBuilder.toString());
     }
 }

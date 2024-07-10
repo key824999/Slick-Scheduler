@@ -1,4 +1,4 @@
-package toy.slick.feign;
+package toy.slick.feign.telegram;
 
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -26,7 +26,7 @@ public interface TelegramFeign {
             "disable_web_page_preview=true"
     })
     Response sendHtmlWithoutPreview(@PathVariable("apiToken") String apiToken,
-                                 @RequestParam("chat_id") String chatId,
-                                 @RequestParam("text") String text);
+                                    @RequestParam("chat_id") String chatId,
+                                    @RequestParam("text") String text);
 
 }

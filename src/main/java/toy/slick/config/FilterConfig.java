@@ -6,8 +6,6 @@ import toy.slick.filter.RequestLoggingFilter;
 
 @Configuration
 public class FilterConfig {
-    // TODO: X-API-KEY
-    // TODO: Bucket4j
 
     @Bean
     public RequestLoggingFilter requestLoggingFilter() {

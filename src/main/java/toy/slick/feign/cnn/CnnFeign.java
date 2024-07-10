@@ -1,8 +1,6 @@
-package toy.slick.feign;
+package toy.slick.feign.cnn;
 
 import feign.Response;
-import lombok.Builder;
-import lombok.Getter;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -14,11 +12,4 @@ public interface CnnFeign {
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     })
     Response getFearAndGreed();
-
-    @Getter
-    @Builder
-    class FearAndGreed {
-        private String rating;
-        private double score;
-    }
 }

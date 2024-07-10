@@ -1,18 +1,20 @@
-package toy.slick.feign;
+package toy.slick.feign.slick;
 
 import feign.Response;
-import lombok.Builder;
-import lombok.Getter;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import toy.slick.feign.slick.vo.request.EconomicEvent;
+import toy.slick.feign.slick.vo.request.FearAndGreed;
 
 import java.util.List;
 
 @FeignClient(name = "SlickFeign", url = "https://port-0-slick-api-lxshnvm735fbe3a8.sel5.cloudtype.app/api")
 public interface SlickFeign {
+    String CODE_SUCCESS = "0000";
 
     @GetMapping(value = "/economicInfo/fearAndGreed")
     Response getFearAndGreed(@RequestHeader String requestApiKey);
@@ -21,9 +23,9 @@ public interface SlickFeign {
     Response putFearAndGreed(@RequestHeader String requestApiKey,
                              FearAndGreed fearAndGreed);
 
-    @GetMapping(value = "/economicInfo/economicEvent/list/{yyyy-MM-dd_UTC}")
+    @GetMapping(value = "/economicInfo/economicEvent/list/{targetDate}")
     Response getEconomicEventList(@RequestHeader String requestApiKey,
-                                  @PathVariable("yyyy-MM-dd_UTC") String date);
+                                  @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") String targetDate);
 
     @PutMapping(value = "/economicInfo/economicEvent")
     Response putEconomicEvent(@RequestHeader String requestApiKey,
@@ -32,24 +34,4 @@ public interface SlickFeign {
     @PutMapping(value = "/economicInfo/economicEvent/list")
     Response putEconomicEventList(@RequestHeader String requestApiKey,
                                   List<EconomicEvent> economicEventList);
-
-    @Getter
-    @Builder
-    class FearAndGreed {
-        private String rating;
-        private double score;
-    }
-
-    @Getter
-    @Builder
-    class EconomicEvent {
-        private String zonedDateTime;
-        private String id;
-        private String name;
-        private String country;
-        private String importance;
-        private String actual;
-        private String forecast;
-        private String previous;
-    }
 }

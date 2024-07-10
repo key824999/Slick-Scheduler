@@ -11,10 +11,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import toy.slick.aspect.TimeLogAspect;
 import toy.slick.common.Const;
-import toy.slick.converter.EconomicInfoConverter;
-import toy.slick.feign.CnnFeign;
-import toy.slick.feign.InvestingFeign;
-import toy.slick.feign.SlickFeign;
+import toy.slick.feign.cnn.reader.CnnFeignReader;
+import toy.slick.feign.cnn.CnnFeign;
+import toy.slick.feign.cnn.vo.response.FearAndGreed;
+import toy.slick.feign.investing.InvestingFeign;
+import toy.slick.feign.investing.reader.InvestingFeignReader;
+import toy.slick.feign.investing.vo.response.EconomicEvent;
+import toy.slick.feign.slick.SlickFeign;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,37 +33,40 @@ public class EconomicInfoScheduler {
     private final SlickFeign slickFeign;
     private final CnnFeign cnnFeign;
     private final InvestingFeign investingFeign;
-    private final EconomicInfoConverter economicInfoConverter;
+
+    private final CnnFeignReader cnnFeignReader;
+    private final InvestingFeignReader investingFeignReader;
 
     public EconomicInfoScheduler(@Value("${slick.api.requestApiKey}") String SLICK_REQUEST_API_KEY,
                                  SlickFeign slickFeign,
                                  CnnFeign cnnFeign,
                                  InvestingFeign investingFeign,
-                                 EconomicInfoConverter economicInfoConverter) {
+                                 CnnFeignReader cnnFeignReader, InvestingFeignReader investingFeignReader) {
         this.SLICK_REQUEST_API_KEY = SLICK_REQUEST_API_KEY;
         this.slickFeign = slickFeign;
         this.cnnFeign = cnnFeign;
         this.investingFeign = investingFeign;
-        this.economicInfoConverter = economicInfoConverter;
+        this.cnnFeignReader = cnnFeignReader;
+        this.investingFeignReader = investingFeignReader;
     }
 
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "40 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveEconomicEventList() throws IOException {
-        List<InvestingFeign.EconomicEvent> investingEconomicEventList;
+        List<EconomicEvent> economicEventList;
 
-        try (Response feignResponse = investingFeign.getEconomicCalendar()) {
-            investingEconomicEventList = economicInfoConverter.getInvestingEconomicCalendar(feignResponse);
+        try (Response response = investingFeign.getEconomicCalendar()) {
+            economicEventList = investingFeignReader.getEconomicEventList(response);
         }
 
-        if (CollectionUtils.isEmpty(investingEconomicEventList)) {
-            throw new NullPointerException("Parsing result list is empty");
+        if (CollectionUtils.isEmpty(economicEventList)) {
+            throw new NullPointerException("economicEventList is empty");
         }
 
-        List<SlickFeign.EconomicEvent> newEconomicEventList = investingEconomicEventList
+        List<toy.slick.feign.slick.vo.request.EconomicEvent> newEconomicEventList = economicEventList
                 .stream()
-                .map(economicEvent -> SlickFeign.EconomicEvent.builder()
+                .map(economicEvent -> toy.slick.feign.slick.vo.request.EconomicEvent.builder()
                         .actual(economicEvent.getActual())
                         .country(economicEvent.getCountry())
                         .id(economicEvent.getId())
@@ -72,8 +78,8 @@ public class EconomicInfoScheduler {
                         .build())
                 .toList();
 
-        try (Response feignResponse = slickFeign.putEconomicEventList(SLICK_REQUEST_API_KEY, newEconomicEventList)) {
-            log.info(feignResponse.toString());
+        try (Response response = slickFeign.putEconomicEventList(SLICK_REQUEST_API_KEY, newEconomicEventList)) {
+            log.info(response.toString());
         }
     }
 
@@ -81,19 +87,19 @@ public class EconomicInfoScheduler {
     @Async
     @Scheduled(cron = "5 */20 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveFearAndGreed() throws IOException {
-        Optional<CnnFeign.FearAndGreed> cnnFearAndGreed;
+        Optional<FearAndGreed> fearAndGreed;
 
-        try (Response feignResponse = cnnFeign.getFearAndGreed()) {
-            cnnFearAndGreed = economicInfoConverter.getCnnFearAndGreed(feignResponse);
+        try (Response response = cnnFeign.getFearAndGreed()) {
+            fearAndGreed = cnnFeignReader.getFearAndGreed(response);
         }
 
-        if (cnnFearAndGreed.isEmpty()) {
-            throw new NullPointerException("Parsing result is null"); // TODO: Exception message -> property
+        if (fearAndGreed.isEmpty()) {
+            throw new NullPointerException("fearAndGreed is empty"); // TODO: Exception message -> property
         }
 
-        SlickFeign.FearAndGreed newFearAndGreed = SlickFeign.FearAndGreed.builder()
-                .rating(cnnFearAndGreed.get().getRating())
-                .score(cnnFearAndGreed.get().getScore())
+        toy.slick.feign.slick.vo.request.FearAndGreed newFearAndGreed = toy.slick.feign.slick.vo.request.FearAndGreed.builder()
+                .rating(fearAndGreed.get().getRating())
+                .score(fearAndGreed.get().getScore())
                 .build();
 
         try (Response feignResponse = slickFeign.putFearAndGreed(SLICK_REQUEST_API_KEY, newFearAndGreed)) {
