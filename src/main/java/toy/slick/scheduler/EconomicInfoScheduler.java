@@ -37,7 +37,7 @@ public class EconomicInfoScheduler {
     private final CnnFeignReader cnnFeignReader;
     private final InvestingFeignReader investingFeignReader;
 
-    public EconomicInfoScheduler(@Value("${slick.api.requestApiKey}") String SLICK_REQUEST_API_KEY,
+    public EconomicInfoScheduler(@Value("${api.key.slick}") String SLICK_REQUEST_API_KEY,
                                  SlickFeign slickFeign,
                                  CnnFeign cnnFeign,
                                  InvestingFeign investingFeign,

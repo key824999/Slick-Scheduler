@@ -49,9 +49,9 @@ info:
   contact:
     email: wjdwo951219@gmail.com
 
-slick:
-  api:
-    requestApiKey: ${slick_api_requestApiKey}
+api:
+  key:
+    slick: ${api_key_slick}
 
 telegram:
   bot:
@@ -60,3 +60,6 @@ telegram:
   chat:
     slick:
       id: ENC(UE0sacH3feg87lC3UdSB3VwwnHhgmyir)
+
+password:
+  executeSchedule: ENC(s2rZBXlFZBKBDlHc2Iw/gd/AYoaHzlDB)
