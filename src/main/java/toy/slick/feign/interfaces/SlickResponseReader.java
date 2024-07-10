@@ -7,15 +7,16 @@ import feign.Response;
 
 import java.io.IOException;
 
-public interface SlickResponseReader extends FeignResponseReader {
+public interface SlickResponseReader extends FeignResponseReader{
     default JsonObject getDataObject(Response feignResponse) throws IOException {
         JsonObject data = null;
 
         if (feignResponse.status() < 400) {
-            data = JsonParser.parseString(this.bodyToString(feignResponse))
-                    .getAsJsonObject()
-                    .get("data")
-                    .getAsJsonObject();
+            JsonObject response = JsonParser.parseString(this.getResponseBody(feignResponse)).getAsJsonObject();
+
+            if ("0000".equals(response.get("code").getAsString())) {
+                data = response.get("data").getAsJsonObject();
+            }
         }
 
         if (data == null || data.isEmpty()) {
@@ -29,10 +30,11 @@ public interface SlickResponseReader extends FeignResponseReader {
         JsonArray data = null;
 
         if (feignResponse.status() < 400) {
-            data = JsonParser.parseString(this.bodyToString(feignResponse))
-                    .getAsJsonObject()
-                    .get("data")
-                    .getAsJsonArray();
+            JsonObject response = JsonParser.parseString(this.getResponseBody(feignResponse)).getAsJsonObject();
+
+            if ("0000".equals(response.get("code").getAsString())) {
+                data = response.get("data").getAsJsonArray();
+            }
         }
 
         if (data == null || data.isEmpty()) {

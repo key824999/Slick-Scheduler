@@ -1,5 +1,7 @@
 package toy.slick.common;
 
+import lombok.Getter;
+
 import java.time.format.DateTimeFormatter;
 
 public interface Const {
@@ -11,14 +13,16 @@ public interface Const {
     String FLAG = "\ud83d\udea9"; // 🚩
     String CHECK_MARK = "\u2705"; // ✅
 
+    @Getter
     enum DateTimeFormat {
         yyyyMMdd("yyyyMMdd", DateTimeFormatter.ofPattern("yyyyMMdd")),
+        yyyyMMdd_hyphen("yyyy-MM-dd", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
         yyyyMMddHH("yyyyMMddHH", DateTimeFormatter.ofPattern("yyyyMMddHH")),
         yyyyMMdd_DotBlank("yyyy. MM. dd.", DateTimeFormatter.ofPattern("yyyy. MM. dd.")),
         yyyyMMddHHmmss("yyyy-MM-dd HH:mm:ss", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        public final String format;
-        public final DateTimeFormatter dateTimeFormatter;
+        private final String format;
+        private final DateTimeFormatter dateTimeFormatter;
 
         DateTimeFormat(String format, DateTimeFormatter dateTimeFormatter) {
             this.format = format;

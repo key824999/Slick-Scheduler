@@ -1,6 +1,8 @@
 package toy.slick.feign;
 
 import feign.Response;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -13,4 +15,10 @@ public interface CnnFeign {
     })
     Response getFearAndGreed();
 
+    @Getter
+    @Builder
+    class FearAndGreed {
+        private String rating;
+        private double score;
+    }
 }

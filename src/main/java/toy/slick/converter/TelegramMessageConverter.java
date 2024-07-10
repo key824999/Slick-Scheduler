@@ -1,14 +1,13 @@
-package toy.slick.parser;
+package toy.slick.converter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
-import toy.slick.feign.SlickFeign;
 import toy.slick.feign.interfaces.SlickResponseReader;
 
 import java.io.IOException;
@@ -17,21 +16,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
-public class TelegramMessageParser implements SlickResponseReader {
-    @Value("${slick.api.requestApiKey}")
-    private String slickRequestApiKey;
+public class TelegramMessageConverter implements SlickResponseReader {
 
-    private final SlickFeign slickFeign;
-
-    public TelegramMessageParser(SlickFeign slickFeign) {
-        this.slickFeign = slickFeign;
-    }
-
-    public String parseFearAndGreed() throws IOException {
-        JsonObject data = this.getDataObject(slickFeign.getFearAndGreed(slickRequestApiKey));
+    public Optional<String> getFearAndGreed(Response feignResponse) throws IOException {
+        JsonObject data = this.getDataObject(feignResponse);
 
         String rating = data.get("rating").getAsString();
         double score = Double.parseDouble(data.get("score").getAsString());
@@ -59,12 +51,13 @@ public class TelegramMessageParser implements SlickResponseReader {
             messageBuilder.append(Const.ZANY_FACE);
         }
 
-        return messageBuilder.toString();
+        return messageBuilder.isEmpty()
+                ? Optional.empty()
+                : Optional.of(messageBuilder.toString());
     }
 
-    public String parseEconomicEventList(ZonedDateTime zonedDateTime) throws IOException {
-        JsonArray data = this.getDataArray(slickFeign.getEconomicEventList(slickRequestApiKey,
-                zonedDateTime.format(Const.DateTimeFormat.yyyyMMdd.dateTimeFormatter)));
+    public Optional<String> getEconomicEventList(Response feignResponse, ZonedDateTime targetDateTime) throws IOException {
+        JsonArray data = this.getDataArray(feignResponse);
 
         Map<String, List<String>> countryEconomicEventListMap = new HashMap<>();
 
@@ -94,10 +87,10 @@ public class TelegramMessageParser implements SlickResponseReader {
         }
 
         if (countryEconomicEventListMap.isEmpty()) {
-            return Const.CHECK_MARK
-                    + zonedDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.dateTimeFormatter)
-                    + " [" + zonedDateTime.getZone().getId() + "] "
-                    + "No important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a>";
+            return Optional.of(Const.CHECK_MARK
+                    + targetDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.getDateTimeFormatter())
+                    + " [" + targetDateTime.getZone().getId() + "] "
+                    + "No important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a>");
         }
 
         StringBuilder messageBuilder = new StringBuilder();
@@ -105,9 +98,9 @@ public class TelegramMessageParser implements SlickResponseReader {
         messageBuilder
                 .append(Const.CHECK_MARK)
                 .append(" <b>")
-                .append(zonedDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.dateTimeFormatter))
+                .append(targetDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.getDateTimeFormatter()))
                 .append(" [")
-                .append(zonedDateTime.getZone().getId())
+                .append(targetDateTime.getZone().getId())
                 .append("] ")
                 .append("Important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a></b>")
                 .append("\n")
@@ -128,6 +121,6 @@ public class TelegramMessageParser implements SlickResponseReader {
                     .append("\n");
         }
 
-        return messageBuilder.toString();
+        return Optional.of(messageBuilder.toString());
     }
 }
