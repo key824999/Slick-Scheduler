@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import toy.slick.feign.slick.vo.request.DowJonesIndustrialAverage;
 import toy.slick.feign.slick.vo.request.EconomicEvent;
 import toy.slick.feign.slick.vo.request.FearAndGreed;
+import toy.slick.feign.slick.vo.request.NasdaqComposite;
+import toy.slick.feign.slick.vo.request.StandardAndPoor500;
 
 import java.util.List;
 
@@ -34,4 +37,16 @@ public interface SlickFeign {
     @PutMapping(value = "/economicInfo/economicEvent/list")
     Response putEconomicEventList(@RequestHeader String requestApiKey,
                                   List<EconomicEvent> economicEventList);
+
+    @PutMapping(value = "/economicInfo/DJI")
+    Response putDJI(@RequestHeader String requestApiKey,
+                    DowJonesIndustrialAverage dowJonesIndustrialAverage);
+
+    @PutMapping(value = "/economicInfo/SPX")
+    Response putSPX(@RequestHeader String requestApiKey,
+                    StandardAndPoor500 standardAndPoor500);
+
+    @PutMapping(value = "/economicInfo/IXIC")
+    Response putIXIC(@RequestHeader String requestApiKey,
+                     NasdaqComposite nasdaqComposite);
 }

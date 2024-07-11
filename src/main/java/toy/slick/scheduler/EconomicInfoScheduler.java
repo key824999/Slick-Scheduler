@@ -11,12 +11,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import toy.slick.aspect.TimeLogAspect;
 import toy.slick.common.Const;
-import toy.slick.feign.cnn.reader.CnnFeignReader;
 import toy.slick.feign.cnn.CnnFeign;
+import toy.slick.feign.cnn.reader.CnnFeignReader;
 import toy.slick.feign.cnn.vo.response.FearAndGreed;
 import toy.slick.feign.economicCalendar.EconomicCalendarFeign;
-import toy.slick.feign.economicCalendar.reader.InvestingFeignReader;
+import toy.slick.feign.economicCalendar.reader.EconomicCalendarFeignReader;
 import toy.slick.feign.economicCalendar.vo.response.EconomicEvent;
+import toy.slick.feign.investing.InvestingFeign;
+import toy.slick.feign.investing.reader.InvestingFeignReader;
+import toy.slick.feign.investing.vo.response.DowJonesIndustrialAverage;
+import toy.slick.feign.investing.vo.response.NasdaqComposite;
+import toy.slick.feign.investing.vo.response.StandardAndPoor500;
 import toy.slick.feign.slick.SlickFeign;
 
 import java.io.IOException;
@@ -33,20 +38,27 @@ public class EconomicInfoScheduler {
     private final SlickFeign slickFeign;
     private final CnnFeign cnnFeign;
     private final EconomicCalendarFeign economicCalendarFeign;
+    private final InvestingFeign investingFeign;
 
     private final CnnFeignReader cnnFeignReader;
+    private final EconomicCalendarFeignReader economicCalendarFeignReader;
     private final InvestingFeignReader investingFeignReader;
 
     public EconomicInfoScheduler(@Value("${api.key.slick}") String SLICK_REQUEST_API_KEY,
                                  SlickFeign slickFeign,
                                  CnnFeign cnnFeign,
                                  EconomicCalendarFeign economicCalendarFeign,
-                                 CnnFeignReader cnnFeignReader, InvestingFeignReader investingFeignReader) {
+                                 InvestingFeign investingFeign,
+                                 CnnFeignReader cnnFeignReader,
+                                 EconomicCalendarFeignReader economicCalendarFeignReader,
+                                 InvestingFeignReader investingFeignReader) {
         this.SLICK_REQUEST_API_KEY = SLICK_REQUEST_API_KEY;
         this.slickFeign = slickFeign;
         this.cnnFeign = cnnFeign;
         this.economicCalendarFeign = economicCalendarFeign;
+        this.investingFeign = investingFeign;
         this.cnnFeignReader = cnnFeignReader;
+        this.economicCalendarFeignReader = economicCalendarFeignReader;
         this.investingFeignReader = investingFeignReader;
     }
 
@@ -57,7 +69,7 @@ public class EconomicInfoScheduler {
         List<EconomicEvent> economicEventList;
 
         try (Response response = economicCalendarFeign.getEconomicCalendar()) {
-            economicEventList = investingFeignReader.getEconomicEventList(response);
+            economicEventList = economicCalendarFeignReader.getEconomicEventList(response);
         }
 
         if (CollectionUtils.isEmpty(economicEventList)) {
@@ -103,6 +115,78 @@ public class EconomicInfoScheduler {
                 .build();
 
         try (Response feignResponse = slickFeign.putFearAndGreed(SLICK_REQUEST_API_KEY, newFearAndGreed)) {
+            log.info(feignResponse.toString());
+        }
+    }
+
+    @TimeLogAspect.TimeLog
+    @Async
+    @Scheduled(cron = "10 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    public void saveDJI() throws IOException {
+        Optional<DowJonesIndustrialAverage> dowJonesIndustrialAverage;
+
+        try (Response response = investingFeign.getDowJonesIndustrialAverage()) {
+            dowJonesIndustrialAverage = investingFeignReader.getDowJonesIndustrialAverageList(response);
+        }
+
+        if (dowJonesIndustrialAverage.isEmpty()) {
+            throw new NullPointerException("dowJonesIndustrialAverage is empty");
+        }
+
+        try (Response feignResponse = slickFeign.putDJI(SLICK_REQUEST_API_KEY,
+                toy.slick.feign.slick.vo.request.DowJonesIndustrialAverage.builder()
+                        .price(dowJonesIndustrialAverage.get().getPrice())
+                        .priceChange(dowJonesIndustrialAverage.get().getPriceChange())
+                        .priceChangePercent(dowJonesIndustrialAverage.get().getPriceChangePercent())
+                        .build())) {
+            log.info(feignResponse.toString());
+        }
+    }
+
+    @TimeLogAspect.TimeLog
+    @Async
+    @Scheduled(cron = "15 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    public void saveSPX() throws IOException {
+        Optional<StandardAndPoor500> standardAndPoor500;
+
+        try (Response response = investingFeign.getStandardAndPoor500()) {
+            standardAndPoor500 = investingFeignReader.getStandardAndPoor500(response);
+        }
+
+        if (standardAndPoor500.isEmpty()) {
+            throw new NullPointerException("standardAndPoor500 is empty");
+        }
+
+        try (Response feignResponse = slickFeign.putSPX(SLICK_REQUEST_API_KEY,
+                toy.slick.feign.slick.vo.request.StandardAndPoor500.builder()
+                        .price(standardAndPoor500.get().getPrice())
+                        .priceChange(standardAndPoor500.get().getPriceChange())
+                        .priceChangePercent(standardAndPoor500.get().getPriceChangePercent())
+                        .build())) {
+            log.info(feignResponse.toString());
+        }
+    }
+
+    @TimeLogAspect.TimeLog
+    @Async
+    @Scheduled(cron = "20 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    public void saveIXIC() throws IOException {
+        Optional<NasdaqComposite> nasdaqComposite;
+
+        try (Response response = investingFeign.getNasdaqComposite()) {
+            nasdaqComposite = investingFeignReader.getNasdaqComposite(response);
+        }
+
+        if (nasdaqComposite.isEmpty()) {
+            throw new NullPointerException("nasdaqComposite is empty");
+        }
+
+        try (Response feignResponse = slickFeign.putIXIC(SLICK_REQUEST_API_KEY,
+                toy.slick.feign.slick.vo.request.NasdaqComposite.builder()
+                        .price(nasdaqComposite.get().getPrice())
+                        .priceChange(nasdaqComposite.get().getPriceChange())
+                        .priceChangePercent(nasdaqComposite.get().getPriceChangePercent())
+                        .build())) {
             log.info(feignResponse.toString());
         }
     }

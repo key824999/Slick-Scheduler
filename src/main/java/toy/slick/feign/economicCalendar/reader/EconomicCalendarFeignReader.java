@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class InvestingFeignReader implements FeignResponseReader {
+public class EconomicCalendarFeignReader implements FeignResponseReader {
 
-    public List<EconomicEvent> getEconomicEventList(Response investingResponse) throws IOException {
-        String responseBody = this.getResponseBody(investingResponse);
+    public List<EconomicEvent> getEconomicEventList(Response economicCalendarFeignResponse) throws IOException {
+        String responseBody = this.getResponseBody(economicCalendarFeignResponse);
 
         Element table = Jsoup.parse(responseBody).getElementById("ecEventsTable");
         Elements rows = table.select("tbody tr");
