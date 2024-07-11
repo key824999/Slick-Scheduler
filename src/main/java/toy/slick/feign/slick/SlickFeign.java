@@ -49,4 +49,13 @@ public interface SlickFeign {
     @PutMapping(value = "/economicInfo/IXIC")
     Response putIXIC(@RequestHeader String requestApiKey,
                      NasdaqComposite nasdaqComposite);
+
+    @GetMapping(value = "/economicInfo/DJI")
+    Response getDJI(@RequestHeader String requestApiKey);
+
+    @GetMapping(value = "/economicInfo/SPX")
+    Response getSPX(@RequestHeader String requestApiKey);
+
+    @GetMapping(value = "/economicInfo/IXIC")
+    Response getIXIC(@RequestHeader String requestApiKey);
 }

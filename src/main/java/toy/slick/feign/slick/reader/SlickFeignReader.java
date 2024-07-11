@@ -105,7 +105,8 @@ public class SlickFeignReader implements SlickResponseReader {
                 .append(targetDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.getDateTimeFormatter()))
                 .append(" [")
                 .append(targetDateTime.getZone().getId())
-                .append("] ")
+                .append("]")
+                .append("\n")
                 .append("Important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a></b>")
                 .append("\n")
                 .append(" : Actual | Forecast | Previous")
@@ -165,5 +166,35 @@ public class SlickFeignReader implements SlickResponseReader {
         }
 
         return economicEventList;
+    }
+
+    public Optional<String> getSPXTelegramMessage(Response SPXResponse) throws IOException {
+        JsonObject SPXJsonObj = this.getDataObject(SPXResponse);
+
+        return StringUtils.isBlank(SPXJsonObj.get("price").getAsString())
+                ? Optional.empty()
+                : Optional.of("<a href='https://www.investing.com/indices/us-spx-500'>S&P 500 (SPX)</a>\n"
+                + " - price : <b>" + SPXJsonObj.get("price").getAsString() + "</b>\n"
+                + " - change : <b>" + SPXJsonObj.get("priceChange").getAsString() + " (" + SPXJsonObj.get("priceChangePercent").getAsString() + ")</b>\n");
+    }
+
+    public Optional<String> getDJITelegramMessage(Response DJIResponse) throws IOException {
+        JsonObject DJIJsonObj = this.getDataObject(DJIResponse);
+
+        return StringUtils.isBlank(DJIJsonObj.get("price").getAsString())
+                ? Optional.empty()
+                : Optional.of("<a href='https://www.investing.com/indices/us-30'>Dow Jones Industrial Average (DJI)</a>\n"
+                + " - price : <b>" + DJIJsonObj.get("price").getAsString() + "</b>\n"
+                + " - change : <b>" + DJIJsonObj.get("priceChange").getAsString() + " (" + DJIJsonObj.get("priceChangePercent").getAsString() + ")</b>\n");
+    }
+
+    public Optional<String> getIXICTelegramMessage(Response IXICResponse) throws IOException {
+        JsonObject IXICJsonObj = this.getDataObject(IXICResponse);
+
+        return StringUtils.isBlank(IXICJsonObj.get("price").getAsString())
+                ? Optional.empty()
+                : Optional.of("<a href='https://www.investing.com/indices/nasdaq-composite'>NASDAQ Composite (IXIC)</a>\n"
+                + " - price : <b>" + IXICJsonObj.get("price").getAsString() + "</b>\n"
+                + " - change : <b>" + IXICJsonObj.get("priceChange").getAsString() + " (" + IXICJsonObj.get("priceChangePercent").getAsString() + ")</b>\n");
     }
 }

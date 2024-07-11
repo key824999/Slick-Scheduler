@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import toy.slick.aspect.TimeLogAspect;
 import toy.slick.common.Const;
-import toy.slick.feign.slick.reader.SlickFeignReader;
 import toy.slick.feign.slick.SlickFeign;
+import toy.slick.feign.slick.reader.SlickFeignReader;
 import toy.slick.feign.telegram.TelegramFeign;
 
 import java.io.IOException;
@@ -83,6 +83,29 @@ public class TelegramScheduler {
         }
 
         try (Response response = telegramFeign.sendHtmlWithoutPreview(SLICK_BOT_API_TOKEN, SLICK_CHAT_ID, message.get())) {
+            log.info(response.toString());
+        }
+    }
+
+    @TimeLogAspect.TimeLog
+    @Async
+    @Scheduled(cron = "0 25 8 * * 2-6", zone = Const.ZoneId.SEOUL)
+    public void sendIndices() throws IOException {
+        StringBuilder messageBuilder = new StringBuilder();
+
+        try (Response DJIResponse = slickFeign.getDJI(SLICK_REQUEST_API_KEY);
+             Response SPXResponse = slickFeign.getSPX(SLICK_REQUEST_API_KEY);
+             Response IXICResponse = slickFeign.getIXIC(SLICK_REQUEST_API_KEY)) {
+            slickFeignReader.getDJITelegramMessage(DJIResponse).ifPresent(messageBuilder::append);
+            slickFeignReader.getSPXTelegramMessage(SPXResponse).ifPresent(messageBuilder::append);
+            slickFeignReader.getIXICTelegramMessage(IXICResponse).ifPresent(messageBuilder::append);
+        }
+
+        if (messageBuilder.isEmpty()) {
+            throw new NullPointerException("message is empty");
+        }
+
+        try (Response response = telegramFeign.sendHtmlWithoutPreview(SLICK_BOT_API_TOKEN, SLICK_CHAT_ID, messageBuilder.toString())) {
             log.info(response.toString());
         }
     }
