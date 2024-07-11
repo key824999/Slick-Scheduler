@@ -153,7 +153,7 @@ public class SlickFeignReader implements SlickResponseReader {
             JsonObject rowObject = row.getAsJsonObject();
 
             economicEventList.add(EconomicEvent.builder()
-                    .dateUTC(rowObject.get("dateUTC").getAsString())
+                    .zonedDateTime(rowObject.get("zonedDateTime").getAsString())
                     .importance(rowObject.get("importance").getAsString())
                     .id(rowObject.get("id").getAsString())
                     .name(rowObject.get("name").getAsString())

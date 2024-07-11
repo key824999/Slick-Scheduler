@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class EconomicEvent {
-    private String dateUTC;
+    private String zonedDateTime;
     private String id;
     private String name;
     private String country;
