@@ -1,4 +1,4 @@
-package toy.slick.feign.investing.vo.response;
+package toy.slick.feign.economicCalendar.vo.response;
 
 import lombok.Builder;
 import lombok.Getter;

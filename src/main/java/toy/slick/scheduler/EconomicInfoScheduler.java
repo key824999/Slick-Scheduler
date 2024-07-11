@@ -14,9 +14,9 @@ import toy.slick.common.Const;
 import toy.slick.feign.cnn.reader.CnnFeignReader;
 import toy.slick.feign.cnn.CnnFeign;
 import toy.slick.feign.cnn.vo.response.FearAndGreed;
-import toy.slick.feign.investing.InvestingFeign;
-import toy.slick.feign.investing.reader.InvestingFeignReader;
-import toy.slick.feign.investing.vo.response.EconomicEvent;
+import toy.slick.feign.economicCalendar.EconomicCalendarFeign;
+import toy.slick.feign.economicCalendar.reader.InvestingFeignReader;
+import toy.slick.feign.economicCalendar.vo.response.EconomicEvent;
 import toy.slick.feign.slick.SlickFeign;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class EconomicInfoScheduler {
 
     private final SlickFeign slickFeign;
     private final CnnFeign cnnFeign;
-    private final InvestingFeign investingFeign;
+    private final EconomicCalendarFeign economicCalendarFeign;
 
     private final CnnFeignReader cnnFeignReader;
     private final InvestingFeignReader investingFeignReader;
@@ -40,12 +40,12 @@ public class EconomicInfoScheduler {
     public EconomicInfoScheduler(@Value("${api.key.slick}") String SLICK_REQUEST_API_KEY,
                                  SlickFeign slickFeign,
                                  CnnFeign cnnFeign,
-                                 InvestingFeign investingFeign,
+                                 EconomicCalendarFeign economicCalendarFeign,
                                  CnnFeignReader cnnFeignReader, InvestingFeignReader investingFeignReader) {
         this.SLICK_REQUEST_API_KEY = SLICK_REQUEST_API_KEY;
         this.slickFeign = slickFeign;
         this.cnnFeign = cnnFeign;
-        this.investingFeign = investingFeign;
+        this.economicCalendarFeign = economicCalendarFeign;
         this.cnnFeignReader = cnnFeignReader;
         this.investingFeignReader = investingFeignReader;
     }
@@ -56,7 +56,7 @@ public class EconomicInfoScheduler {
     public void saveEconomicEventList() throws IOException {
         List<EconomicEvent> economicEventList;
 
-        try (Response response = investingFeign.getEconomicCalendar()) {
+        try (Response response = economicCalendarFeign.getEconomicCalendar()) {
             economicEventList = investingFeignReader.getEconomicEventList(response);
         }
 

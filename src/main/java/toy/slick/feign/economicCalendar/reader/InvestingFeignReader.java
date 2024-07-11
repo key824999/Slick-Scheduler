@@ -1,4 +1,4 @@
-package toy.slick.feign.investing.reader;
+package toy.slick.feign.economicCalendar.reader;
 
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import toy.slick.common.Const;
 import toy.slick.feign.interfaces.FeignResponseReader;
-import toy.slick.feign.investing.vo.response.EconomicEvent;
+import toy.slick.feign.economicCalendar.vo.response.EconomicEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
