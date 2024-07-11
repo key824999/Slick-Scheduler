@@ -87,6 +87,8 @@ public class TelegramScheduler {
         }
     }
 
+    // TODO : 상수화
+
     @TimeLogAspect.TimeLog
     @Async
     @Scheduled(cron = "0 25 8 * * 2-6", zone = Const.ZoneId.SEOUL)
