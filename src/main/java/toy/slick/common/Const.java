@@ -12,6 +12,8 @@ public interface Const {
     String ZANY_FACE = "\uD83E\uDD2A"; // 🤪
     String FLAG = "\ud83d\udea9"; // 🚩
     String CHECK_MARK = "\u2705"; // ✅
+    String DOWN_CHART = "\uD83D\uDCC9"; // 📉
+    String UP_CHART = "\uD83D\uDCC8"; // 📈
 
     @Getter
     enum DateTimeFormat {
