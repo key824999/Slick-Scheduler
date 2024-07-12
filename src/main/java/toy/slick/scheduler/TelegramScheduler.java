@@ -36,7 +36,8 @@ public class TelegramScheduler {
     public TelegramScheduler(@Value("${api.key.slick}") String SLICK_REQUEST_API_KEY,
                              @Value("${telegram.bot.slick.apiToken}") String SLICK_BOT_API_TOKEN,
                              @Value("${telegram.chat.slick.id}") String SLICK_CHAT_ID,
-                             SlickFeign slickFeign, TelegramFeign telegramFeign,
+                             SlickFeign slickFeign,
+                             TelegramFeign telegramFeign,
                              SlickFeignReader slickFeignReader) {
         this.SLICK_REQUEST_API_KEY = SLICK_REQUEST_API_KEY;
         this.SLICK_BOT_API_TOKEN = SLICK_BOT_API_TOKEN;
