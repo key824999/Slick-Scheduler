@@ -64,7 +64,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "40 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveEconomicEventList() throws IOException {
         List<EconomicEvent> economicEventList;
 
@@ -97,7 +97,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "50 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 26,56 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveFearAndGreed() throws IOException {
         Optional<FearAndGreed> fearAndGreed;
 
@@ -121,7 +121,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 27,57 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveDJI() throws IOException {
         Optional<DowJonesIndustrialAverage> dowJonesIndustrialAverage;
 
@@ -145,7 +145,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 28,58 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveSPX() throws IOException {
         Optional<StandardAndPoor500> standardAndPoor500;
 
