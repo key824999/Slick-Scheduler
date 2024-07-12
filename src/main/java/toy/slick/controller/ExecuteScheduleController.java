@@ -45,4 +45,15 @@ public class ExecuteScheduleController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/telegram/sendIndices")
+    public ResponseEntity<String> sendIndices(@RequestParam String password) throws IOException {
+        if (!StringUtils.equals(PASSWORD, password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        telegramScheduler.sendIndices();
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
