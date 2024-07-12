@@ -97,7 +97,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "5 */20 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "50 9,19,29,39,49,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveFearAndGreed() throws IOException {
         Optional<FearAndGreed> fearAndGreed;
 

@@ -179,8 +179,8 @@ public class SlickFeignReader implements SlickResponseReader {
         return StringUtils.isBlank(SPXJsonObj.get("price").getAsString())
                 ? Optional.empty()
                 : Optional.of(titleIcon + "<a href='https://www.investing.com/indices/us-spx-500'>S&P 500 (SPX)</a>\n"
-                + " - price : <b>" + price + "</b>\n"
-                + " - change : <b>" + priceChange + " (" + priceChangePercent + ")</b>\n");
+                + " - price : <b><u>" + price + "</u></b>\n"
+                + " - change : <b><u>" + priceChange + " (" + priceChangePercent + ")</u></b>\n");
     }
 
     public Optional<String> getDJITelegramMessage(Response DJIResponse) throws IOException {
@@ -194,8 +194,8 @@ public class SlickFeignReader implements SlickResponseReader {
         return StringUtils.isBlank(DJIJsonObj.get("price").getAsString())
                 ? Optional.empty()
                 : Optional.of(titleIcon + "<a href='https://www.investing.com/indices/us-30'>Dow Jones Industrial Average (DJI)</a>\n"
-                + " - price : <b>" + price + "</b>\n"
-                + " - change : <b>" + priceChange + " (" + priceChangePercent + ")</b>\n");
+                + " - price : <b><u>" + price + "</u></b>\n"
+                + " - change : <b><u>" + priceChange + " (" + priceChangePercent + ")</u></b>\n");
     }
 
     public Optional<String> getIXICTelegramMessage(Response IXICResponse) throws IOException {
@@ -209,7 +209,7 @@ public class SlickFeignReader implements SlickResponseReader {
         return StringUtils.isBlank(IXICJsonObj.get("price").getAsString())
                 ? Optional.empty()
                 : Optional.of(titleIcon + "<a href='https://www.investing.com/indices/nasdaq-composite'>NASDAQ Composite (IXIC)</a>\n"
-                + " - price : <b>" + price + "</b>\n"
-                + " - change : <b>" + priceChange + " (" + priceChangePercent + ")</b>\n");
+                + " - price : <b><u>" + price + "</u></b>\n"
+                + " - change : <b><u>" + priceChange + " (" + priceChangePercent + ")</u></b>\n");
     }
 }
