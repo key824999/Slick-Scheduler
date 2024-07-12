@@ -97,7 +97,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "50 9,19,29,39,49,59 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "50 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveFearAndGreed() throws IOException {
         Optional<FearAndGreed> fearAndGreed;
 
@@ -121,7 +121,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "10 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveDJI() throws IOException {
         Optional<DowJonesIndustrialAverage> dowJonesIndustrialAverage;
 
@@ -145,7 +145,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "15 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveSPX() throws IOException {
         Optional<StandardAndPoor500> standardAndPoor500;
 
@@ -169,7 +169,7 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "20 */10 * * * *", zone = Const.ZoneId.NEW_YORK)
+    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveIXIC() throws IOException {
         Optional<NasdaqComposite> nasdaqComposite;
 
