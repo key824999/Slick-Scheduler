@@ -64,7 +64,9 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
+    // TODO : Rollback
+    @Scheduled(cron = "25 * * * * *", zone = Const.ZoneId.NEW_YORK)
+//    @Scheduled(cron = "45 25,55 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveEconomicEventList() throws IOException {
         List<EconomicEvent> economicEventList;
 
@@ -97,7 +99,9 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 26,56 * * * *", zone = Const.ZoneId.NEW_YORK)
+    // TODO : Rollback
+    @Scheduled(cron = "30 * * * * *", zone = Const.ZoneId.NEW_YORK)
+//    @Scheduled(cron = "45 26,56 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveFearAndGreed() throws IOException {
         Optional<FearAndGreed> fearAndGreed;
 
@@ -121,7 +125,9 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 27,57 * * * *", zone = Const.ZoneId.NEW_YORK)
+//    TODO : Rollback
+    @Scheduled(cron = "35 * * * * *", zone = Const.ZoneId.NEW_YORK)
+//    @Scheduled(cron = "45 27,57 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveDJI() throws IOException {
         Optional<DowJonesIndustrialAverage> dowJonesIndustrialAverage;
 
@@ -145,7 +151,9 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 28,58 * * * *", zone = Const.ZoneId.NEW_YORK)
+    //    TODO : Rollback
+    @Scheduled(cron = "40 * * * * *", zone = Const.ZoneId.NEW_YORK)
+//    @Scheduled(cron = "45 28,58 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveSPX() throws IOException {
         Optional<StandardAndPoor500> standardAndPoor500;
 
@@ -169,7 +177,9 @@ public class EconomicInfoScheduler {
 
     @TimeLogAspect.TimeLog
     @Async
-    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
+    //    TODO : Rollback
+    @Scheduled(cron = "45 * * * * *", zone = Const.ZoneId.NEW_YORK)
+//    @Scheduled(cron = "45 29,59 * * * *", zone = Const.ZoneId.NEW_YORK)
     public void saveIXIC() throws IOException {
         Optional<NasdaqComposite> nasdaqComposite;
 
