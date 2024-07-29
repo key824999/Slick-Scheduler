@@ -3,12 +3,16 @@ package toy.slick.feign.slick.reader;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import toy.slick.common.Const;
-import toy.slick.feign.interfaces.SlickResponseReader;
+import toy.slick.feign.interfaces.FeignResponseReader;
+import toy.slick.feign.slick.SlickFeign;
 import toy.slick.feign.slick.vo.response.EconomicEvent;
 import toy.slick.feign.slick.vo.response.FearAndGreed;
 
@@ -22,7 +26,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class SlickFeignReader implements SlickResponseReader {
+public class SlickFeignReader implements FeignResponseReader {
 
     public Optional<String> getFearAndGreedTelegramMessage(Response slickResponse) throws IOException {
         Optional<FearAndGreed> fearAndGreed = this.getFearAndGreed(slickResponse);
@@ -211,5 +215,37 @@ public class SlickFeignReader implements SlickResponseReader {
                 : Optional.of(titleIcon + "<b><a href='https://www.investing.com/indices/nasdaq-composite'>NASDAQ Composite (IXIC)</a></b>\n"
                 + " - price : <b><u>" + price + "</u></b>\n"
                 + " - change : <b><u>" + priceChange + " (" + priceChangePercent + ")</u></b>\n");
+    }
+
+    private JsonObject getDataObject(Response slickResponse) throws IOException {
+        if (slickResponse.status() != 200) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(slickResponse.status()), slickResponse.reason());
+        }
+
+        JsonObject response = JsonParser.parseString(this.getResponseBody(slickResponse)).getAsJsonObject();
+
+        JsonObject data = null;
+
+        if (SlickFeign.CODE_SUCCESS.equals(response.get("code").getAsString())) {
+            data = response.get("data").getAsJsonObject();
+        }
+
+        return data;
+    }
+
+    private JsonArray getDataArray(Response slickResponse) throws IOException {
+        if (slickResponse.status() != 200) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(slickResponse.status()), slickResponse.reason());
+        }
+
+        JsonObject response = JsonParser.parseString(this.getResponseBody(slickResponse)).getAsJsonObject();
+
+        JsonArray data = null;
+
+        if (SlickFeign.CODE_SUCCESS.equals(response.get("code").getAsString())) {
+            data = response.get("data").getAsJsonArray();
+        }
+
+        return data;
     }
 }
