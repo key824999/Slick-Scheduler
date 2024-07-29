@@ -96,9 +96,10 @@ public class SlickFeignReader implements FeignResponseReader {
 
         if (countryEconomicEventListMap.isEmpty()) {
             return Optional.of(Const.CHECK_MARK
+                    + " <b>"
                     + targetDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.getDateTimeFormatter())
                     + " [" + targetDateTime.getZone().getId() + "]\n"
-                    + "No important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a>");
+                    + "Important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a> is Empty</b>");
         }
 
         StringBuilder messageBuilder = new StringBuilder();
