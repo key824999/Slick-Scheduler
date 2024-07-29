@@ -93,7 +93,7 @@ public class SlickFeignReader implements SlickResponseReader {
         if (countryEconomicEventListMap.isEmpty()) {
             return Optional.of(Const.CHECK_MARK
                     + targetDateTime.format(Const.DateTimeFormat.yyyyMMdd_DotBlank.getDateTimeFormatter())
-                    + " [" + targetDateTime.getZone().getId() + "] "
+                    + " [" + targetDateTime.getZone().getId() + "]\n"
                     + "No important <a href='https://m.investing.com/economic-calendar/'>Economic Index List</a>");
         }
 
@@ -131,7 +131,7 @@ public class SlickFeignReader implements SlickResponseReader {
                 : Optional.of(messageBuilder.toString());
     }
 
-    public Optional<FearAndGreed> getFearAndGreed(Response slickResponse) throws IOException {
+    private Optional<FearAndGreed> getFearAndGreed(Response slickResponse) throws IOException {
         JsonObject data = this.getDataObject(slickResponse);
 
         String rating = data.get("rating").getAsString();
@@ -145,7 +145,7 @@ public class SlickFeignReader implements SlickResponseReader {
                 .build());
     }
 
-    public List<EconomicEvent> getEconomicEventList(Response slickResponse) throws IOException {
+    private List<EconomicEvent> getEconomicEventList(Response slickResponse) throws IOException {
         List<EconomicEvent> economicEventList = new ArrayList<>();
 
         JsonArray data = this.getDataArray(slickResponse);

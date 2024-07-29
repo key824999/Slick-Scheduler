@@ -24,10 +24,6 @@ public interface SlickResponseReader extends FeignResponseReader {
             data = response.get("data").getAsJsonObject();
         }
 
-        if (data == null || data.isEmpty()) {
-            throw new NullPointerException("data is empty");
-        }
-
         return data;
     }
 
@@ -42,10 +38,6 @@ public interface SlickResponseReader extends FeignResponseReader {
 
         if (SlickFeign.CODE_SUCCESS.equals(response.get("code").getAsString())) {
             data = response.get("data").getAsJsonArray();
-        }
-
-        if (data == null || data.isEmpty()) {
-            throw new NullPointerException("data is empty");
         }
 
         return data;
